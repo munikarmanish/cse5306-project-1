@@ -8,7 +8,6 @@ from pathlib import Path
 
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 8080
-BUFFER_SIZE = 65536
 
 
 def abort(msg):
@@ -55,15 +54,15 @@ def do_upload(sock, filename):
         abort("invalid file")
     encoded = base64.b64encode(file.read_bytes()).decode()
     msg = "{}\n{}\n{}".format("UPLOAD", file.name, encoded)
-    sock.send(msg.encode())
+    sock.sendto(msg.encode(), (SERVER_IP, SERVER_PORT))
 
 
 def do_download(sock, filename):
     msg = "{}\n{}".format("DOWNLOAD", filename)
-    sock.send(msg.encode())
+    sock.sendto(msg.encode(), (SERVER_IP, SERVER_PORT))
     ready = select.select([sock], [], [], 1)[0]
     if ready:
-        data, _sender = sock.recvfrom(BUFFER_SIZE)
+        data = sock.recv(65536)
         Path("downloads/").mkdir(parents=True, exist_ok=True)
         Path("downloads/{}".format(filename)).write_bytes(data)
     else:
@@ -72,12 +71,12 @@ def do_download(sock, filename):
 
 def do_delete(sock, filename):
     msg = "{}\n{}".format("DELETE", filename)
-    sock.send(msg.encode())
+    sock.sendto(msg.encode(), (SERVER_IP, SERVER_PORT))
 
 
 def do_rename(sock, filename, new_filename):
     msg = "{}\n{}\n{}".format("RENAME", filename, new_filename)
-    sock.send(msg.encode())
+    sock.sendto(msg.encode(), (SERVER_IP, SERVER_PORT))
 
 
 def main():
