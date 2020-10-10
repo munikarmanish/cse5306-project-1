@@ -29,7 +29,6 @@ Open multiple terminal and from them try the following commands:
     $ python3 client.py download file2.txt
     $ python3 client.py delete file2.txt
 
-In windows, simply use the command python instead of python3.
-The file that are being used should be in the same directory as the script files.
+The file to upload used should be in the same directory as the script files.
 The uploaded files will be in the `uploads/` directory, and the downloaded
 files will be in the `downloads/` directory.

@@ -29,5 +29,6 @@ Then, in another terminal, run the client:
     $ python3 client.py download file2.txt
     $ python3 client.py delete file2.txt
 
+The file to upload used should be in the same directory as the script files.
 The uploaded files will be in the `uploads/` directory, and the downloaded
 files will be in the `downloads/` directory.

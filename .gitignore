@@ -1,4 +1,5 @@
 **.vscode**
 **.pycache**
+**__pycache__**
 uploads/
 downloads/

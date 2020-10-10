@@ -59,7 +59,6 @@ class AsyncRPC:
         if "response_type" not in response:
             raise RuntimeError("No response type received from server")
 
-        print(response)
         self.computation_id = response["token"]
 
     def get_result(self):

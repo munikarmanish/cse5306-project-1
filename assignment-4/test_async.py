@@ -1,22 +1,24 @@
 # author: Hamza Reza Pavel, Manish Munikar
 
+import time
+
 from client import AsyncRPC
 
 
 def main():
-    print("\nasync request for calculate_pi")
+    print("async request for calculate_pi")
     pi_rpc = AsyncRPC("calculate_pi", args=[])
     pi_rpc.invoke()
 
-    print("\nasync request for add(1, 2)")
+    print("async request for add(1, 2)")
     add_rpc = AsyncRPC("add", args=[1, 2])
     add_rpc.invoke()
 
-    print("\nfetching results for calculate_pi")
-    print(pi_rpc.get_result())
+    print("\ndoing sth else...\n")
+    time.sleep(1)
 
-    print("\nfetching results for add(1, 2)")
-    print(add_rpc.get_result())
+    print("fetching results for calculate_pi = {}".format(pi_rpc.get_result()))
+    print("fetching results for add(1, 2) = {}".format(add_rpc.get_result()))
 
 
 if __name__ == "__main__":

@@ -21,49 +21,47 @@ class WorkerThread(Thread):
         # print(f"New thread started for client address: {ip}:{port}")
 
     def run(self):
-        data = self.conn.recv(BUFFER_SIZE)
-        message = data.decode()
-        tokens = message.split("\n")
-        command = tokens[0].strip().lower()
+        msg = self.conn.recv(BUFFER_SIZE)
+        tokens = msg.split(b"\n", maxsplit=2)
+        command = tokens[0].decode().strip().lower()
 
         if command == "upload":
-            filename = tokens[1].strip()
-            encoded = tokens[2].strip().encode()
-            file_data = base64.b64decode(encoded)
+            filename = tokens[1].decode().strip()
+            file_data = tokens[2]
             Path("uploads/").mkdir(parents=True, exist_ok=True)
             Path("uploads/{}".format(filename)).write_bytes(file_data)
-            print(f"Uploaded '{filename}'")
+            print(f"{self.client_ip}:{self.client_port} - Uploaded '{filename}'")
 
         elif command == "download":
-            filename = tokens[1].strip()
+            filename = tokens[1].decode().strip()
             file = Path("uploads/{}".format(filename))
             if file.is_file():
-                self.conn.sendto(file.read_bytes(), (self.client_ip, self.client_port))
-                print(f"Downloaded '{filename}'")
+                self.conn.send(file.read_bytes())
+                print(f"{self.client_ip}:{self.client_port} - Downloaded '{filename}'")
 
         elif command == "delete":
-            filename = tokens[1].strip()
+            filename = tokens[1].decode().strip()
             file = Path("uploads/{}".format(filename))
             if file.is_file():
                 file.unlink()
-                print(f"Deleted '{filename}'")
+                print(f"{self.client_ip}:{self.client_port} - Deleted '{filename}'")
 
         elif command == "rename":
-            filename = tokens[1].strip()
-            new_filename = tokens[2].strip()
+            filename = tokens[1].decode().strip()
+            new_filename = tokens[2].decode().strip()
             file = Path("uploads/{}".format(filename))
             new_file = Path("uploads/{}".format(new_filename))
             if file.is_file():
                 file.rename(new_file)
-                print(f"Renamed '{filename}' to '{new_filename}'")
+                print(f"{self.client_ip}:{self.client_port} - Renamed '{filename}' to '{new_filename}'")
 
 
 def main():
     tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     tcpsock.bind((SERVER_IP, SERVER_PORT))
-    print("Server running. Waiting for connection...")
     tcpsock.listen(CONNECTION_LIMIT)
+    print(f"Server running at {SERVER_IP}:{SERVER_PORT}")
     while True:
         (conn, (client_ip, client_port)) = tcpsock.accept()
         # print(f"Connection request from {client_ip}:{client_port}")

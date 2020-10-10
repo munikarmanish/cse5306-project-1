@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import base64
 import select
 import socket
 import sys
@@ -53,9 +52,10 @@ def do_upload(sock, filename):
     file = Path(filename)
     if not file.is_file():
         abort("invalid file")
-    encoded = base64.b64encode(file.read_bytes()).decode()
-    msg = "{}\n{}\n{}".format("UPLOAD", file.name, encoded)
-    sock.send(msg.encode())
+    data = file.read_bytes()
+    command = bytearray("{}\n{}\n".format("UPLOAD", file.name).encode())
+    msg = command + data
+    sock.send(msg)
 
 
 def do_download(sock, filename):
